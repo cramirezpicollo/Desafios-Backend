@@ -1,46 +1,90 @@
+const fs = require("fs");
+
 class ProductManager {
     constructor() {
-        this.products = [];
+        this.path = "./productos.txt"
+        this.products = []
 
     }
 
     static id = 0
 
-    addProduct(title, description, price, img, code, stock) {
-        for (let i = 0; i < this.products.length; i++) {
-            if (this.products[i].code === code) {
-                console.log(`El codigo ${code} está repetido`);
-                break;
-            }
-        }
+    addProduct = async (title, description, price, img, code, stock) => {
 
         ProductManager.id++
-        this.products.push({ title, description, price, img, code, stock, id: ProductManager.id });
+
+        let newProduct = {
+            title,
+            description,
+            price,
+            img,
+            code,
+            stock,
+            id: ProductManager.id
+        };
+
+        this.products.push(newProduct)
+
+        await fs.promises.writeFile(this.path, JSON.stringify(this.products, null, 2));
+    };
+
+    readProducts = async () => {
+        let respuesta = await fs.promises.readFile(this.path, "utf-8")
+        return JSON.parse(respuesta)
+
     }
 
-    getProducts() {
-        return this.products;
+    getProducts = async () => {
+        let respuesta2 = await this.readProducts()
+        return console.log(respuesta2)
     }
 
-    productoExistente(id) {
-        return this.products.find((producto) => producto.id === id)
-    }
+    getProductById = async (id) => {
+        let respuesta3 = await this.readProducts()
+        if (!respuesta3.find(product => product.id === id)) {
+            console.log("not found");
 
-    getProductById(id) {
-        if (!this.productoExistente(id)) {
-            console.log("Not found")
         } else {
-            console.log(this.productoExistente(id))
+            console.log(respuesta3.find((product) => product.id === id));
+
         }
-    }
+
+    };
+
+    deleteProductById = async (id) => {
+        let respuesta3 = await this.readProducts();
+        let productFilter = respuesta3.filter(products => products.id != id);
+        await fs.promises.writeFile(this.path, JSON.stringify(productFilter, null, 2));
+
+    };
+
+
+    updateProducts = async ({ id, ...producto }) => {
+        await this.deleteProductById(id);
+        let productViejo = await this.readProducts();
+        let productModificado = [{ id, ...producto }, ...productViejo];
+        await fs.promises.writeFile(this.path, JSON.stringify(productModificado,null,2));
+    };
+
 }
 
-let productoAgregado = new ProductManager();
+const productos = new ProductManager();
+//productos.addProduct("producto prueba", "este es un producto prueba", 200, "img", "abc123", 25);
+//productos.addProduct("producto prueba2", "este es un producto prueba2", 400, "img", "abc123", 50);
 
-productoAgregado.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25)
+//productos.getProducts ()
 
-console.log(productoAgregado.getProducts());
+//productos.getProductById (3);
 
-productoAgregado.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25)
+//productos.deleteProductById(1)
 
-productoAgregado.getProductById(3)
+productos.updateProducts({
+    title: "prueba 3",
+    description: "prod 3",
+    price: 6000,
+    img: "img",
+    code: "abc 345",
+    stock: 16,
+    id: 3
+})
+

@@ -1,0 +1,20 @@
+[
+  {
+    "id": 3,
+    "title": "prueba 3",
+    "description": "prod 3",
+    "price": 6000,
+    "img": "img",
+    "code": "abc 345",
+    "stock": 16
+  },
+  {
+    "title": "producto prueba2",
+    "description": "este es un producto prueba2",
+    "price": 400,
+    "img": "img",
+    "code": "abc123",
+    "stock": 50,
+    "id": 2
+  }
+]
